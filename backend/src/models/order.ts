@@ -2,16 +2,16 @@ import { DataTypes, Model } from 'sequelize';
 import sequelize from '../database';
 
 class Order extends Model {
-    public id!: number
-    public clientName!: string
-    public clientPhone!: string
-    public address!: string //direccion de entrega
-    public latitude!: number
-    public longitude!: number
-    public quantityMembrillo!: number
-    public quantityBatata!: number
-    public deliveryDate!: string
-    public status!: 'pendiente'| 'en_reparto' | 'entregado'| 'cancelado';
+    declare id: number
+    declare clientName: string
+    declare clientPhone: string
+    declare address: string //direccion de entrega
+    declare latitude: number
+    declare longitude: number
+    declare quantityMembrillo: number
+    declare quantityBatata: number
+    declare deliveryDate: string
+    declare status: 'pendiente'| 'en_reparto' | 'entregado'| 'cancelado';
 
 }
 Order.init(
@@ -55,7 +55,7 @@ Order.init(
         },
         status:{
             type: DataTypes.ENUM('pendiente','en_reparto','entregado','cancelado'), // Solo permite estos 4 valores exactos
-            defaultValue: 'Pendiente',
+            defaultValue: 'pendiente',
         },
 
     },

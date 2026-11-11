@@ -5,10 +5,17 @@ import dotenv from 'dotenv'
 dotenv.config();
 
 //creamos la instancia de sequelize para conectarnos con PostgreSQL
-const sequelize = new Sequelize ('pastelitos_db', 'postgres','password123', {
-host: 'localhost',    
-port: 5433,
-dialect: 'postgres',
-logging: false //evitamos q la terminal se llene de logs inecesarios de sql
+const sequelize = new Sequelize('pastelitos_db', 'postgres', 'password123', {
+  host: 'localhost',
+  port: 5433,
+  dialect: 'postgres',
+  logging: false,
+  dialectOptions: {
+    // Forzamos un timeout y desactivamos opciones avanzadas de socket que a veces cierran la conexión en Windows
+    ssl: false,
+  }
 });
-export default sequelize;
+module.exports = sequelize;
+
+
+//evitamos q la terminal se llene de logs inecesarios de sql
