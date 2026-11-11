@@ -1,20 +1,68 @@
 import { DataTypes, Model } from 'sequelize';
 import sequelize from '../database';
-import nodeCrypto = require('node:crypto');
 
-export class order extends model {
-    public id!: Number
+class Order extends Model {
+    public id!: number
     public clientName!: string
     public clientPhone!: string
-    public address!: string
+    public address!: string //direccion de entrega
     public latitude!: number
     public longitude!: number
     public quantityMembrillo!: number
-    public quantitiyBatata!: number
-    public deliveryDate!: number
-    public status!: 'Pendiente'| 'en_reparto' | 'entregado'|'Cancelado';
+    public quantityBatata!: number
+    public deliveryDate!: string
+    public status!: 'pendiente'| 'en_reparto' | 'entregado'| 'cancelado';
 
 }
-order.init(
-    {}
-)
+Order.init(
+    {
+        id:{
+            type: DataTypes.INTEGER,
+            autoIncrement: true, //que sea auto incremental (se suma solo 1, 2, 3...)
+            primaryKey: true,
+        },
+        clientName:{
+            type: DataTypes.STRING,
+            allowNull: false, //obliga a que el campo no sea nulo
+        },
+        clientPhone:{
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
+        address:{
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
+        latitude:{
+            type: DataTypes.FLOAT,
+            allowNull: true, //Opcional (se completa cuando geolocalizamos con Leaflet)
+        },
+        longitude:{
+            type: DataTypes.FLOAT,
+            allowNull: true, //Opcional (se completa cuando geolocalizamos con Leaflet)
+        },
+        quantityMembrillo:{
+            type: DataTypes.INTEGER,
+            allowNull: false,
+        },
+        quantityBatata:{
+            type: DataTypes.INTEGER,
+            allowNull: false,
+        },
+        deliveryDate:{
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
+        status:{
+            type: DataTypes.ENUM('pendiente','en_reparto','entregado','cancelado'), // Solo permite estos 4 valores exactos
+            defaultValue: 'Pendiente',
+        },
+
+    },
+    {
+        sequelize,
+        modelName: 'Order',
+        tableName: 'orders',
+    }
+);
+export default Order;
