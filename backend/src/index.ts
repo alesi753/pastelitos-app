@@ -1,6 +1,7 @@
 import express from 'express';
 import sequelize from './database'; 
 import order from './models/order';
+import orderRoutes from './routes/order.routes';
 
 const app= express(); //inicializamos la app de express
 const PORT = process.env.PORT || 3000
@@ -28,4 +29,5 @@ const startServer = async () => {
     
 
 };
+app.use('/api/orders', orderRoutes);
 startServer(); //ejecutamos la funcion de arranque
