@@ -1,10 +1,13 @@
 import { Router } from 'express';
 import Order from '../models/order';
+import { login } from '../controllers/auth.controller';
+import { verifyAdmin } from '../middlewares/auth.middleware';
 
 const router = Router();
 
-// GET: Obtener todos los pedidos
-router.get('/', async (req, res) => {
+router.post('/login', login);
+
+router.get('/', verifyAdmin, async (_req, res) => {
   try {
     const orders = await Order.findAll();
     res.json(orders);
@@ -24,7 +27,6 @@ router.post('/', async (req, res) => {
       quantityMembrillo,
       quantityBatata,
       deliveryDate,
-      status: 'pendiente' // Nace como pendiente por defecto
     });
     res.status(201).json(newOrder);
   } catch (error) {
@@ -32,25 +34,8 @@ router.post('/', async (req, res) => {
   }
 });
 
-// PATCH: Cambiar el estado del pedido (pendiente / en camino)
-router.patch('/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { status } = req.body;
-    const order = await Order.findByPk(id);
-    if (!order) {
-      return res.status(404).json({ error: 'Pedido no encontrado' });
-    }
-    order.status = status;
-    await order.save();
-    res.json(order);
-  } catch (error) {
-    res.status(400).json({ error: 'Error al actualizar el estado' });
-  }
-});
-
 // DELETE: Eliminar un pedido por ID
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', verifyAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     const deleted = await Order.destroy({ where: { id } });

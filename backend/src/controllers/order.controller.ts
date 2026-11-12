@@ -62,33 +62,6 @@ export const listOrders = async (_req: Request, res: Response): Promise<void> =>
   }
 };
 
-// Actualiza el estado de un pedido buscando por su ID
-export const updateOrderStatus = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { id } = req.params;                                               // Extrae el ID de la URL
-    const { status } = req.body;                                             // Extrae el nuevo estado del body
-
-    const order = await Order.findByPk(id);                                  // Busca el pedido por clave primaria
-    if (!order) {
-      res.status(404).json({ success: false, message: 'Pedido no encontrado' }); // Retorna 404 si no existe
-      return;
-    }
-
-    order.status = status;                                                   // Cambia el estado en la instancia
-    await order.save();                                                      // Guarda los cambios en la base de datos
-
-    res.json({
-      success: true,
-      data: order,                                                           // Devuelve el pedido ya actualizado
-    });
-  } catch (error: any) {
-    res.status(400).json({
-      success: false,
-      message: 'Error al actualizar el estado',
-      error: error.message,
-    });
-  }
-};
 // Busca un pedido específico por su ID
 export const getOrderById = async (req: Request, res: Response): Promise<void> => {
   try {
