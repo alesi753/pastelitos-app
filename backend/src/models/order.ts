@@ -2,16 +2,16 @@ import { DataTypes, Model } from 'sequelize';
 import sequelize from '../database';          
 
 class Order extends Model {
-  declare id: number;                         
-  declare clientName: string;                 
-  declare clientPhone: string;                
-  declare address: string;                    
-  declare latitude: number | null;            
-  declare longitude: number | null;           
-  declare quantityMembrillo: number;          
-  declare quantityBatata: number;             
-  declare deliveryDate: string;               // Fecha de entrega
-  declare status: string;                     // Estado actual del pedido
+  declare id: number;                          
+  declare clientName: string;                  // Nombre y apellido del cliente (obligatorio)
+  declare clientPhone: string;                 
+  declare address: string;                     
+  declare latitude: number | null;             
+  declare longitude: number | null;            
+  declare quantityMembrillo: number;           // Cantidad de pastelitos de membrillo (con límite)
+  declare quantityBatata: number;              // Cantidad de pastelitos de batata (con límite)
+  declare deliveryDate: string;                // Fecha de entrega (desde hoy en adelante)
+  declare status: string;                      // Estado actual del pedido
 }
 
 Order.init(
@@ -23,7 +23,7 @@ Order.init(
     },
     clientName: {
       type: DataTypes.STRING,
-      allowNull: false,                       
+      allowNull: false,                        // Obligatorio: no se permite dejarlo vacío
     },
     clientPhone: {
       type: DataTypes.STRING,
@@ -52,7 +52,7 @@ Order.init(
       defaultValue: 0,                        // Por defecto arranca en 0
     },
     deliveryDate: {
-      type: DataTypes.STRING,
+      type: DataTypes.DATEONLY,               // Usar DATEONLY para guardar la fecha limpia sin horas raras
       allowNull: false,                       
     },
     status: {
@@ -67,4 +67,4 @@ Order.init(
   },
 );
 
-export default Order;                         
+export default Order;
