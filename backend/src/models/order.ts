@@ -1,68 +1,70 @@
-import { DataTypes, Model } from 'sequelize';
-import sequelize from '../database';
+import { DataTypes, Model } from 'sequelize'; 
+import sequelize from '../database';          
 
 class Order extends Model {
-    declare id: number
-    declare clientName: string
-    declare clientPhone: string
-    declare address: string //direccion de entrega
-    declare latitude: number
-    declare longitude: number
-    declare quantityMembrillo: number
-    declare quantityBatata: number
-    declare deliveryDate: string
-    declare status: 'pendiente'| 'en_reparto' | 'entregado'| 'cancelado';
-
+  declare id: number;                         
+  declare clientName: string;                 
+  declare clientPhone: string;                
+  declare address: string;                    
+  declare latitude: number | null;            
+  declare longitude: number | null;           
+  declare quantityMembrillo: number;          
+  declare quantityBatata: number;             
+  declare deliveryDate: string;               // Fecha de entrega
+  declare status: string;                     // Estado actual del pedido
 }
-Order.init(
-    {
-        id:{
-            type: DataTypes.INTEGER,
-            autoIncrement: true, //que sea auto incremental (se suma solo 1, 2, 3...)
-            primaryKey: true,
-        },
-        clientName:{
-            type: DataTypes.STRING,
-            allowNull: false, //obliga a que el campo no sea nulo
-        },
-        clientPhone:{
-            type: DataTypes.STRING,
-            allowNull: false,
-        },
-        address:{
-            type: DataTypes.STRING,
-            allowNull: false,
-        },
-        latitude:{
-            type: DataTypes.FLOAT,
-            allowNull: true, //Opcional (se completa cuando geolocalizamos con Leaflet)
-        },
-        longitude:{
-            type: DataTypes.FLOAT,
-            allowNull: true, //Opcional (se completa cuando geolocalizamos con Leaflet)
-        },
-        quantityMembrillo:{
-            type: DataTypes.INTEGER,
-            allowNull: false,
-        },
-        quantityBatata:{
-            type: DataTypes.INTEGER,
-            allowNull: false,
-        },
-        deliveryDate:{
-            type: DataTypes.STRING,
-            allowNull: false,
-        },
-        status:{
-            type: DataTypes.ENUM('pendiente','en_reparto','entregado','cancelado'), // Solo permite estos 4 valores exactos
-            defaultValue: 'pendiente',
-        },
 
+Order.init(
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
     },
-    {
-        sequelize,
-        modelName: 'Order',
-        tableName: 'orders',
-    }
+    clientName: {
+      type: DataTypes.STRING,
+      allowNull: false,                       
+    },
+    clientPhone: {
+      type: DataTypes.STRING,
+      allowNull: false,                       
+    },
+    address: {
+      type: DataTypes.STRING,
+      allowNull: false,                       
+    },
+    latitude: {
+      type: DataTypes.FLOAT,
+      allowNull: true,                        // Latitud opcional
+    },
+    longitude: {
+      type: DataTypes.FLOAT,
+      allowNull: true,                        // Longitud opcional
+    },
+    quantityMembrillo: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,                        // Por defecto arranca en 0
+    },
+    quantityBatata: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,                        // Por defecto arranca en 0
+    },
+    deliveryDate: {
+      type: DataTypes.STRING,
+      allowNull: false,                       
+    },
+    status: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'pendiente',              
+    },
+  },
+  {
+    sequelize,                                
+    tableName: 'orders',                      
+  },
 );
-export default Order;
+
+export default Order;                         
