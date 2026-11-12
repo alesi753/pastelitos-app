@@ -55,7 +55,7 @@ El proyecto está estructurado bajo una **arquitectura desacoplada (Client-Serve
    * Sigue un diseño modular (Modelos y Rutas) utilizando **Sequelize ORM** para interactuar con una base de datos relacional **PostgreSQL**.
    * Incluye validaciones de negocio, manejo de estados de pedidos y pruebas automatizadas con **Vitest**.
 
-
+```
 [ Cliente / Navegador ] 
        │ (HTTP / JSON)
        ▼
@@ -64,6 +64,7 @@ El proyecto está estructurado bajo una **arquitectura desacoplada (Client-Serve
                                             [ Sequelize ORM ]
                                                     │
                                            [ Base de Datos (PostgreSQL) ]
+```
 
 
 ---
