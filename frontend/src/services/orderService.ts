@@ -9,7 +9,6 @@ export interface Order {
   flavor: 'Membrillo' | 'Batata' | 'Mixto';
   traysCount: number; // Cantidad de bandejas
   deliveryDate: string;
-  status: 'Pendiente' | 'En camino' | 'Entregado';
 }
 
 export const getOrders = async (): Promise<Order[]> => {
@@ -25,16 +24,6 @@ export const createOrder = async (order: Order): Promise<Order> => {
     body: JSON.stringify(order),
   });
   if (!response.ok) throw new Error('Error al crear el pedido');
-  return response.json();
-};
-
-export const updateOrderStatus = async (id: number, status: Order['status']): Promise<Order> => {
-  const response = await fetch(`${API_URL}/orders/${id}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ status }),
-  });
-  if (!response.ok) throw new Error('Error al actualizar el estado');
   return response.json();
 };
 

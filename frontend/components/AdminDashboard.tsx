@@ -1,6 +1,6 @@
 // src/components/AdminDashboard.tsx
 import React, { useEffect, useState } from 'react';
-import { getOrders, createOrder, updateOrderStatus, deleteOrder, Order } from '../services/orderService';
+import { getOrders, createOrder, deleteOrder, type Order } from '../services/orderService';
 import { formatTrayToKitchen } from '../utils/kitchenFormat';
 
 export const AdminDashboard: React.FC = () => {
@@ -39,7 +39,6 @@ export const AdminDashboard: React.FC = () => {
         flavor,
         traysCount,
         deliveryDate,
-        status: 'Pendiente',
       });
       // Limpiar form y recargar
       setClientName('');
@@ -50,28 +49,6 @@ export const AdminDashboard: React.FC = () => {
       loadOrders();
     } catch (error) {
       console.error("Error al crear el pedido:", error);
-    }
-  };
-
-  const handleStatusChange = async (id: number | undefined, currentStatus: Order['status']) => {
-    console.log("ID recibido al hacer clic:", id); // Control en consola del navegador (F12)
-    
-    if (!id) {
-      alert("Error: Este pedido no tiene un ID válido asignado.");
-      return;
-    }
-
-    const nextStatus: Record<Order['status'], Order['status']> = {
-      'Pendiente': 'En camino',
-      'En camino': 'Entregado',
-      'Entregado': 'Pendiente',
-    };
-
-    try {
-      await updateOrderStatus(id, nextStatus[currentStatus]);
-      loadOrders(); // Recarga la lista desde la base de datos
-    } catch (error) {
-      console.error("Error al actualizar el estado:", error);
     }
   };
 
@@ -149,7 +126,6 @@ export const AdminDashboard: React.FC = () => {
             <th>Gusto</th>
             <th>Cantidad (Cocina)</th>
             <th>Entrega</th>
-            <th>Estado</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -163,12 +139,6 @@ export const AdminDashboard: React.FC = () => {
               <td>{formatTrayToKitchen(order.traysCount)}</td>
               <td>{order.deliveryDate}</td>
               <td>
-                <span style={{ padding: '4px 8px', borderRadius: '4px', background: order.status === 'Entregado' ? '#d4edda' : '#fff3cd' }}>
-                  {order.status}
-                </span>
-              </td>
-              <td>
-                <button onClick={() => handleStatusChange(order.id, order.status)}>Estado</button>
                 <button onClick={() => handleDelete(order.id)} style={{ color: 'red' }}>Borrar</button>
                 </td>
             </tr>

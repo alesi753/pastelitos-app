@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
+import { formatName } from '../utils/formatName';
 
 interface Order {
   id: number;
@@ -9,12 +10,10 @@ interface Order {
   quantityMembrillo: number;
   quantityBatata: number;
   deliveryDate: string;
-  status: string;
 }
 
 export default function AdminDashboard() {
   const [orders, setOrders] = useState<Order[]>([]);                                    // Estado para almacenar la lista de pedidos
-  const [updatingStatusFor, setUpdatingStatusFor] = useState<number | null>(null);
   const [clientName, setClientName] = useState('');                                      // Estado para el nombre del cliente
   const [clientPhone, setClientPhone] = useState('');                                    // Estado para el teléfono (solo números)
   const [address, setAddress] = useState('');                                            // Estado para la dirección de entrega
@@ -24,7 +23,17 @@ export default function AdminDashboard() {
   const [sortBy, setSortBy] = useState<'llegada' | 'fecha' | 'nombre'>('fecha');         // Orden por defecto en 'fecha'
   const [filterFlavor, setFilterFlavor] = useState<'todos' | 'membrillo' | 'batata'>('todos'); // Estado para filtrar por gusto
   
-  const todayStr = new Date().toISOString().split('T')[0];                               // Fecha actual formateada como YYYY-MM-DD
+  const formatDate = (date: Date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+  const today = new Date();
+  const todayStr = formatDate(today);
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const tomorrowStr = formatDate(tomorrow);
   const [deliveryDate, setDeliveryDate] = useState(todayStr);                            // Estado para la fecha de entrega seleccionada
 
   const fetchOrders = async () => {                                                      // Función para obtener los pedidos desde el backend
@@ -39,15 +48,6 @@ export default function AdminDashboard() {
   useEffect(() => {
     fetchOrders();                                                                       // Carga los pedidos al montar el componente
   }, []);
-
-  const formatName = (text: string) => {                                                 // Función para normalizar mayúsculas/minúsculas
-    return text
-      .toLowerCase()
-      .split(' ')
-      .filter(Boolean)
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))                         // Pone la primera letra en mayúscula y el resto en minúscula
-      .join(' ');
-  };
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {                 // Manejador del cambio en el input de nombre
     const value = e.target.value;
@@ -70,34 +70,6 @@ export default function AdminDashboard() {
       fetchOrders();                                                                     // Recarga la lista de pedidos
     } catch (error) {
       console.error('Error al eliminar el pedido:', error);
-    }
-  };
-
-  // Función para ciclar el estado entre pendiente -> en camino -> entregado -> pendiente
-  const handleToggleStatus = async (id: number, currentStatus: string) => {
-    if (updatingStatusFor !== null) return;
-
-    setUpdatingStatusFor(id);
-    try {
-      let newStatus = 'pendiente';
-      if (currentStatus === 'pendiente') {
-        newStatus = 'en camino';
-      } else if (currentStatus === 'en camino') {
-        newStatus = 'entregado';
-      } else {
-        newStatus = 'pendiente';
-      }
-
-      const response = await api.patch(`/orders/${id}`, { status: newStatus });
-      setOrders(currentOrders =>
-        currentOrders.map(order =>
-          order.id === id ? { ...order, status: response.data.status } : order
-        )
-      );
-    } catch (error) {
-      console.error('Error al actualizar el estado:', error);
-    } finally {
-      setUpdatingStatusFor(null);
     }
   };
 
@@ -175,19 +147,27 @@ export default function AdminDashboard() {
     }
   });
 
-  // Calcular totales generales para producción de cocina
-  const totalMembrillo = orders.reduce((acc, o) => acc + o.quantityMembrillo, 0);
-  const totalBatata = orders.reduce((acc, o) => acc + o.quantityBatata, 0);
+  const kitchenSummaries = [
+    { label: 'Hoy', orders: orders.filter((order) => order.deliveryDate === todayStr), accent: '#28a745' },
+    { label: 'Mañana', orders: orders.filter((order) => order.deliveryDate === tomorrowStr), accent: '#17a2b8' },
+    { label: 'Más adelante', orders: orders.filter((order) => order.deliveryDate > tomorrowStr), accent: '#9b8afb' },
+    { label: 'Total', orders, accent: '#ffc107' },
+  ].map(({ label, orders: summaryOrders, accent }) => ({
+    label,
+    accent,
+    membrillo: summaryOrders.reduce((total, order) => total + order.quantityMembrillo, 0),
+    batata: summaryOrders.reduce((total, order) => total + order.quantityBatata, 0),
+  }));
 
   return (
     <div style={{ padding: '20px', color: '#fff', backgroundColor: '#121212', minHeight: '100vh' }}>
       <h1>Panel de Administración - Pastelitos</h1>
       
       {/* Contenedor superior en dos columnas (Formulario a la izquierda, Resumen de cocina a la derecha) */}
-      <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', alignItems: 'flex-start', marginBottom: '30px' }}>
+      <div className="admin-top-layout" style={{ marginBottom: '30px' }}>
         
         {/* Formulario de Carga */}
-        <div style={{ background: '#1e1e1e', padding: '20px', borderRadius: '8px', width: '100%', maxWidth: '500px' }}>
+        <div style={{ background: '#1e1e1e', padding: '20px', borderRadius: '8px', width: '100%', boxSizing: 'border-box' }}>
           <h2>Cargar Pedido Manual</h2>
           
           {errorMsg && (
@@ -274,11 +254,25 @@ export default function AdminDashboard() {
         </div>
 
         {/* Resumen de producción para la cocina (A la derecha) */}
-        <div style={{ background: '#1e1e1e', padding: '20px', borderRadius: '8px', width: '100%', maxWidth: '350px', border: '1px solid #333' }}>
-          <h3 style={{ margin: '0 0 15px 0', color: '#ffc107' }}>Total a Preparar (Cocina)</h3>
-          <p style={{ margin: '10px 0', fontSize: '15px' }}><strong>Membrillo:</strong><br /> {formatBandejas(totalMembrillo)}</p>
-          <hr style={{ borderColor: '#333', margin: '10px 0' }} />
-          <p style={{ margin: '10px 0', fontSize: '15px' }}><strong>Batata:</strong><br /> {formatBandejas(totalBatata)}</p>
+        <div style={{ background: '#1e1e1e', padding: '20px', borderRadius: '8px', width: '100%', boxSizing: 'border-box', border: '1px solid #333' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '12px', marginBottom: '18px' }}>
+            <h3 style={{ margin: 0, color: '#fff' }}>Preparación</h3>
+            <span style={{ color: '#999', fontSize: '12px' }}>Por fecha de entrega</span>
+          </div>
+          <div style={{ display: 'grid', gap: '8px' }}>
+            {kitchenSummaries.map((summary, index) => {
+              const indent = index * 14;
+              return (
+                <div key={summary.label} style={{ marginLeft: `${indent}px`, width: `calc(100% - ${indent}px)`, boxSizing: 'border-box', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px', background: '#252525', padding: '10px 12px', borderRadius: '5px', borderLeft: `3px solid ${summary.accent}`, ...(summary.label === 'Total' ? { background: '#302b1d' } : {}) }}>
+                  <strong style={{ color: summary.accent, fontSize: '13px', whiteSpace: 'nowrap' }}>{summary.label}</strong>
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', fontSize: '12px', minWidth: 0 }}>
+                    <span style={{ color: '#ddd', textAlign: 'right' }}><span style={{ color: '#999' }}>Membrillo </span><strong>{formatBandejas(summary.membrillo)}</strong></span>
+                    <span style={{ color: '#ddd', textAlign: 'right' }}><span style={{ color: '#999' }}>Batata </span><strong>{formatBandejas(summary.batata)}</strong></span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
 
       </div>
@@ -328,44 +322,20 @@ export default function AdminDashboard() {
               <th style={{ padding: '10px' }}>Membrillo</th>
               <th style={{ padding: '10px' }}>Batata</th>
               <th style={{ padding: '10px' }}>Fecha</th>
-              <th style={{ padding: '10px' }}>Estado</th>
               <th style={{ padding: '10px' }}>Acciones</th>
             </tr>
           </thead>
           <tbody>
             {sortedOrders.map((o) => {
-              const currentStatus = o.status || 'pendiente';
-              const statusBg = currentStatus === 'entregado' ? '#28a745' : currentStatus === 'en camino' ? '#ffc107' : '#17a2b8';
-
               return (
                 <tr key={o.id} style={{ borderBottom: '1px solid #333' }}>
-                  <td style={{ padding: '10px' }}>{o.clientName}</td>
+                  <td style={{ padding: '10px' }}>{formatName(o.clientName)}</td>
                   <td style={{ padding: '10px' }}>{o.clientPhone}</td>
                   <td style={{ padding: '10px' }}>{o.address}</td>
                   <td style={{ padding: '10px' }}>{formatBandejas(o.quantityMembrillo)}</td>
                   <td style={{ padding: '10px' }}>{formatBandejas(o.quantityBatata)}</td>
                   <td style={{ padding: '10px' }}>{o.deliveryDate}</td>
-                  <td style={{ padding: '10px' }}>
-                    <span style={{ 
-                      padding: '4px 8px', 
-                      borderRadius: '4px', 
-                      background: statusBg, 
-                      color: currentStatus === 'en camino' ? '#000' : '#fff', 
-                      fontWeight: 'bold',
-                      fontSize: '12px'
-                    }}>
-                      {currentStatus}
-                    </span>
-                  </td>
                   <td style={{ padding: '10px', display: 'flex', gap: '5px' }}>
-                    <button 
-                      type="button"
-                      disabled={updatingStatusFor !== null}
-                      onClick={() => handleToggleStatus(o.id, currentStatus)}
-                      style={{ background: '#ffc107', color: '#000', border: 'none', padding: '5px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
-                    >
-                      Estado
-                    </button>
                     <button 
                       onClick={() => handleDeleteOrder(o.id)}
                       style={{ background: '#dc3545', color: '#fff', border: 'none', padding: '5px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
