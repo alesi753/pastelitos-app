@@ -7,4 +7,12 @@ const api = axios.create({
   },
 });
 
+api.interceptors.request.use((config) => {
+  const token = sessionStorage.getItem('adminToken');
+  if (token) {
+    config.headers.set('Authorization', `Bearer ${token}`);
+  }
+  return config;
+});
+
 export default api;                                        
