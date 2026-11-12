@@ -36,7 +36,27 @@ El proyecto está estructurado bajo una arquitectura desacoplada (Client-Server)
 
 
 
-      [ Cliente / Navegador ] 
+# Sistema de Gestión de Pedidos - Pastelitos
+
+Sistema web full-stack desarrollado para la administración, control de producción y seguimiento de repartos de un emprendimiento local de elaboración de pastelitos artesanales. Creado bajo buenas prácticas de ingeniería de software, arquitectura modular y un flujo de control de versiones profesional.
+
+---
+
+## 🏗️ Arquitectura del Sistema
+
+El proyecto está estructurado bajo una **arquitectura desacoplada (Client-Server)**, dividida en dos grandes capas que se comunican mediante una API RESTful:
+
+1. **Capa de Presentación (Frontend - SPA)**:
+   * Desarrollada en **React** con **TypeScript**.
+   * Encargada de la interfaz de usuario, validaciones en tiempo real de formularios, filtrado dinámico de datos y traducción automática de unidades de cocina (bandejas y docenas).
+   
+2. **Capa de Lógica y Persistencia (Backend - REST API)**:
+   * Desarrollada en **Node.js** con **Express** y **TypeScript**.
+   * Sigue un diseño modular (Modelos y Rutas) utilizando **Sequelize ORM** para interactuar con una base de datos relacional **PostgreSQL**.
+   * Incluye validaciones de negocio, manejo de estados de pedidos y pruebas automatizadas con **Vitest**.
+
+```text
+[ Cliente / Navegador ] 
        │ (HTTP / JSON)
        ▼
 [ Frontend (React + TS) ] ──(API REST)──> [ Backend (Node.js + Express) ]
@@ -44,7 +64,6 @@ El proyecto está estructurado bajo una arquitectura desacoplada (Client-Server)
                                             [ Sequelize ORM ]
                                                     │
                                            [ Base de Datos (PostgreSQL) ]
-
 
 
 ---
