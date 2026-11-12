@@ -14,6 +14,7 @@ interface Order {
 
 export default function AdminDashboard() {
   const [orders, setOrders] = useState<Order[]>([]);                                    // Estado para almacenar la lista de pedidos
+  const [updatingStatusFor, setUpdatingStatusFor] = useState<number | null>(null);
   const [clientName, setClientName] = useState('');                                      // Estado para el nombre del cliente
   const [clientPhone, setClientPhone] = useState('');                                    // Estado para el teléfono (solo números)
   const [address, setAddress] = useState('');                                            // Estado para la dirección de entrega
@@ -74,6 +75,9 @@ export default function AdminDashboard() {
 
   // Función para ciclar el estado entre pendiente -> en camino -> entregado -> pendiente
   const handleToggleStatus = async (id: number, currentStatus: string) => {
+    if (updatingStatusFor !== null) return;
+
+    setUpdatingStatusFor(id);
     try {
       let newStatus = 'pendiente';
       if (currentStatus === 'pendiente') {
@@ -84,10 +88,16 @@ export default function AdminDashboard() {
         newStatus = 'pendiente';
       }
 
-      await api.patch(`/orders/${id}`, { status: newStatus });                           // Petición PATCH para actualizar el estado
-      fetchOrders();                                                                     // Recarga la lista
+      const response = await api.patch(`/orders/${id}`, { status: newStatus });
+      setOrders(currentOrders =>
+        currentOrders.map(order =>
+          order.id === id ? { ...order, status: response.data.status } : order
+        )
+      );
     } catch (error) {
       console.error('Error al actualizar el estado:', error);
+    } finally {
+      setUpdatingStatusFor(null);
     }
   };
 
@@ -349,6 +359,8 @@ export default function AdminDashboard() {
                   </td>
                   <td style={{ padding: '10px', display: 'flex', gap: '5px' }}>
                     <button 
+                      type="button"
+                      disabled={updatingStatusFor !== null}
                       onClick={() => handleToggleStatus(o.id, currentStatus)}
                       style={{ background: '#ffc107', color: '#000', border: 'none', padding: '5px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
                     >
