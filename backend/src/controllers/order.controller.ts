@@ -89,3 +89,19 @@ export const updateOrderStatus = async (req: Request, res: Response): Promise<vo
     });
   }
 };
+// Busca un pedido específico por su ID
+export const getOrderById = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;                                               // Extrae el ID de la URL
+    const order = await Order.findByPk(id);                                  // Busca el pedido en la base de datos
+
+    if (!order) {
+      res.status(404).json({ success: false, message: 'Pedido no encontrado' }); // Si no existe, devuelve 404
+      return;
+    }
+
+    res.json({ success: true, data: order });                                // Devuelve el pedido encontrado
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: 'Error al buscar el pedido', error: error.message });
+  }
+};
