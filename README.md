@@ -36,21 +36,21 @@ El proyecto está estructurado bajo una arquitectura desacoplada (Client-Server)
 
 
 
-[ Cliente / Navegador ] 
+      [ Cliente / Navegador ] 
 
-       │ (HTTP / JSON)
+                │ (HTTP / JSON)
 
-       ▼
+                ▼
 
 [ Frontend (React + TS) ] ──(API REST)──> [ Backend (Node.js + Express) ]
 
-       │
+                │
 
- [ Sequelize ORM ]
+          [ Sequelize ORM ]
 
-       │
-
-[ Base de Datos (PostgreSQL) ]
+                │
+         
+   [ Base de Datos (PostgreSQL) ]
 
 
 
