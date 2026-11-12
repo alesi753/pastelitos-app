@@ -23,8 +23,8 @@ describe('Order Model Unit Tests', () => {
   it('debería fallar al intentar crear un pedido sin nombre de cliente (clientName)', async () => {
     try {
       await Order.create({ //no existe el clientName:
-        clientPhone: '2914000000',
-        address: 'Calle Falsa 123',
+        clientPhone: '0000000000',
+        address: 'Dirección ficticia',
         deliveryDate: '2026-10-30',
         quantityMembrillo: 2,
         quantityBatata: 1,
@@ -39,9 +39,9 @@ describe('Order Model Unit Tests', () => {
 
   it('debería asignar el estado "pendiente" correctamente al persistir', async () => {
     const newOrder = await Order.create({
-      clientName: 'Juan Pérez',
-      clientPhone: '2915000000',
-      address: 'Avenida Alem 500',
+      clientName: 'Cliente de prueba',
+      clientPhone: '0000000000',
+      address: 'Dirección ficticia',
       deliveryDate: '2026-11-01',
       quantityMembrillo: 1,
       quantityBatata: 1,

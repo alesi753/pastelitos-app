@@ -191,6 +191,8 @@ Para llevar el proyecto a entorno productivo y disponibilizarlo online, la infra
 
    npm run dev
 
+   Para cargar cuatro pedidos ficticios en una base vacía, ejecutar antes `npm run seed:demo` desde `backend`. El comando se detiene si ya hay pedidos y no modifica registros existentes. No incluir datos reales ni copias de bases locales en el repositorio.
+
 
 4. Configurar e iniciar el Frontend:
 
