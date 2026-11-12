@@ -1,5 +1,7 @@
 # Sistema de Gestión de Pedidos - Pastelitos
 
+**Clave demo para admin: `STANLEY`**
+
 
 
 Sistema web full-stack desarrollado para la administración, control de producción y seguimiento de repartos de un emprendimiento local de elaboración de pastelitos artesanales. Creado bajo buenas prácticas de ingeniería de software, arquitectura modular y un flujo de control de versiones profesional.
@@ -177,20 +179,31 @@ Para llevar el proyecto a entorno productivo y disponibilizarlo online, la infra
 
 
 
-2. Configurar e iniciar el Backend:
+2. Configurar las credenciales del Backend:
 
    cd backend
 
    npm install
 
+   Copiar `.env.example` como `.env`, configurar `ADMIN_PASS` con una clave propia y `JWT_SECRET` con al menos 32 bytes aleatorios. Por ejemplo, generar el secreto con `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`. Elegí una contraseña larga y única para proteger datos personales. No subir `.env` a Git.
+
+3. Iniciar el Backend:
+
    npm run dev
 
 
-
-3. Configurar e iniciar el Frontend:
+4. Configurar e iniciar el Frontend:
 
    cd ../frontend
 
    npm install
 
    npm run dev
+
+## Acceso de demostración al panel
+
+- Abrir `/admin` en la dirección del frontend para ingresar al panel.
+- Para habilitarla en una instancia de demo, configurar `ADMIN_PASS=STANLEY` en las variables de entorno del backend. El `JWT_SECRET` debe generarse aleatoriamente y mantenerse privado; nunca se publica ni se comparte.
+- Usar exclusivamente una base de datos con pedidos ficticios. El panel permite consultar y borrar pedidos, así que cualquier persona que conozca la clave puede realizar esas acciones.
+- Antes de cargar datos reales o usar la app de forma privada, cambiar `ADMIN_PASS` por una clave larga y única y generar un `JWT_SECRET` nuevo. En hosting, actualizar las variables de entorno y reiniciar el backend.
+- No subir `backend/.env` a GitHub. El archivo está ignorado por Git; `backend/.env.example` solo contiene nombres de variables vacíos.
