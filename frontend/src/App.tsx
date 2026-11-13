@@ -1,8 +1,28 @@
 import { useState } from 'react';
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminLogin from './pages/AdminLogin';
 import ClientOrderView from './pages/ClientOrderView';
+
+interface AppNavigationProps {
+  adminToken: string | null;
+  onLogout: () => void;
+}
+
+function AppNavigation({ adminToken, onLogout }: AppNavigationProps) {
+  const { pathname } = useLocation();
+
+  return (
+    <nav className="app-navigation" aria-label="Navegación principal">
+      <span className="app-brand"><span aria-hidden="true">✳</span> GLENBOCKY</span>
+      {adminToken && pathname === '/admin' && (
+        <button type="button" className="app-logout-button" onClick={onLogout}>
+          Cerrar sesión
+        </button>
+      )}
+    </nav>
+  );
+}
 
 function App() {
   const [adminToken, setAdminToken] = useState(() => sessionStorage.getItem('adminToken'));
@@ -19,14 +39,7 @@ function App() {
 
   return (
     <BrowserRouter>
-      <nav className="app-navigation" aria-label="Navegación principal">
-        <span className="app-brand"><span aria-hidden="true">✳</span> GLENBOCKY</span>
-        {adminToken && (
-          <button type="button" className="app-logout-button" onClick={handleLogout}>
-            Cerrar sesión
-          </button>
-        )}
-      </nav>
+      <AppNavigation adminToken={adminToken} onLogout={handleLogout} />
 
       <Routes>
         <Route path="/" element={<ClientOrderView />} />

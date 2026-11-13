@@ -1,4 +1,3 @@
-// src/components/AdminDashboard.tsx
 import React, { useEffect, useState } from 'react';
 import { getOrders, createOrder, deleteOrder, type Order } from '../services/orderService';
 import { formatTrayToKitchen } from '../utils/kitchenFormat';
@@ -8,7 +7,6 @@ export const AdminDashboard: React.FC = () => {
   const [filterFlavor, setFilterFlavor] = useState<string>('Todos');
   const [sortBy, setSortBy] = useState<'deliveryDate' | 'clientName'>('deliveryDate');
 
-  // Formulario state
   const [clientName, setClientName] = useState('');
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
@@ -40,7 +38,6 @@ export const AdminDashboard: React.FC = () => {
         traysCount,
         deliveryDate,
       });
-      // Limpiar form y recargar
       setClientName('');
       setPhone('');
       setAddress('');
@@ -62,7 +59,6 @@ export const AdminDashboard: React.FC = () => {
     }
   };
 
-  // Filtrado y ordenamiento
   const filteredOrders = orders
     .filter(order => filterFlavor === 'Todos' || order.flavor === filterFlavor)
     .sort((a, b) => {
@@ -76,7 +72,6 @@ export const AdminDashboard: React.FC = () => {
     <div className="admin-container" style={{ padding: '20px', fontFamily: 'sans-serif' }}>
       <h1>Panel de Administración - Pastelitos</h1>
 
-      {/* Formulario de Carga */}
       <form onSubmit={handleSubmit} style={{ background: '#f4f4f4', padding: '15px', borderRadius: '8px', marginBottom: '20px' }}>
         <h3>Nuevo Pedido</h3>
         <div style={{ display: 'grid', gap: '10px', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
@@ -96,7 +91,6 @@ export const AdminDashboard: React.FC = () => {
         </button>
       </form>
 
-      {/* Filtros y Orden */}
       <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
         <div>
           <label>Filtrar por gusto: </label>
@@ -116,7 +110,6 @@ export const AdminDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Listado de Pedidos */}
       <table style={{ width: '100%', borderCollapse: 'collapse', background: '#fff' }}>
         <thead>
           <tr style={{ background: '#ddd', textAlign: 'left' }}>

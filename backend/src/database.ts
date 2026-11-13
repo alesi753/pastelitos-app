@@ -1,21 +1,38 @@
 import { Sequelize } from 'sequelize';
-import dotenv from 'dotenv'
+import dotenv from 'dotenv';
+import { resolve } from 'node:path';
 
-//carga las variables del entorno desde un archivo .env si lo hubiera
-dotenv.config();
-
-//creamos la instancia de sequelize para conectarnos con PostgreSQL
-const sequelize = new Sequelize('pastelitos_db', 'postgres', 'password123', {
-  host: 'localhost',
-  port: 5433,
-  dialect: 'postgres',
-  logging: false,
-  dialectOptions: {
-    // Forzamos un timeout y desactivamos opciones avanzadas de socket que a veces cierran la conexión en Windows
-    ssl: false,
-  }
+dotenv.config({
+  path: [resolve(__dirname, '../../.env'), resolve(__dirname, '../.env')],
 });
-module.exports = sequelize;
 
+const dialectOptions = {
+  ssl: process.env.NODE_ENV === 'production' ? { require: true } : false,
+};
 
-//evitamos q la terminal se llene de logs inecesarios de sql
+const requiredDatabaseSetting = (name: string): string => {
+  const value = process.env[name];
+  if (!value) {
+    throw new Error(`${name} must be configured to connect to PostgreSQL.`);
+  }
+  return value;
+};
+
+const sequelize = process.env.DATABASE_URL
+  ? new Sequelize(process.env.DATABASE_URL, {
+      dialect: 'postgres',
+      logging: false,
+      dialectOptions,
+    })
+  : new Sequelize({
+      database: requiredDatabaseSetting('DB_NAME'),
+      username: requiredDatabaseSetting('DB_USER'),
+      password: requiredDatabaseSetting('DB_PASSWORD'),
+      host: requiredDatabaseSetting('DB_HOST'),
+      port: Number(process.env.DB_PORT || 5433),
+      dialect: 'postgres',
+      logging: false,
+      dialectOptions,
+    });
+
+export default sequelize;

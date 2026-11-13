@@ -1,5 +1,4 @@
-// src/services/orderService.ts
-const API_URL = 'http://localhost:3000/api'; 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
 export interface Order {
   id?: number;
@@ -7,7 +6,7 @@ export interface Order {
   phone: string;
   address: string;
   flavor: 'Membrillo' | 'Batata' | 'Mixto';
-  traysCount: number; // Cantidad de bandejas
+  traysCount: number;
   deliveryDate: string;
 }
 

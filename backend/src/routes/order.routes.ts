@@ -16,7 +16,6 @@ router.get('/', verifyAdmin, async (_req, res) => {
   }
 });
 
-// POST: Crear un nuevo pedido
 router.post('/', async (req, res) => {
   try {
     const { clientName, clientPhone, address, quantityMembrillo, quantityBatata, deliveryDate } = req.body;
@@ -34,7 +33,6 @@ router.post('/', async (req, res) => {
   }
 });
 
-// DELETE: Eliminar un pedido por ID
 router.delete('/:id', verifyAdmin, async (req, res) => {
   try {
     const { id } = req.params;

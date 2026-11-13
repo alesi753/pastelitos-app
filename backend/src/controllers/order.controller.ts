@@ -1,13 +1,12 @@
-import { Request, Response } from 'express';                   // Importa tipos de Express para request y response
-import Order from '../models/order';                           // Importa el modelo Order de Sequelize
+import type { Request, Response } from 'express';
+import Order from '../models/order';
 
 export const createOrder = async (req: Request, res: Response): Promise<void> => {
   try {
     const { clientName, clientPhone, address, deliveryDate, quantityMembrillo, quantityBatata, latitude, longitude } = req.body;
 
-    // Validación opcional: Si envían coordenadas, verificamos que estén en Bahía Blanca
     if (latitude !== null && latitude !== undefined && longitude !== null && longitude !== undefined) {
-      // Rangos aproximados para el radio urbano de Bahía Blanca
+      // Estos rangos aproximan el área urbana donde se realizan las entregas.
       const isLatValid = latitude >= -38.85 && latitude <= -38.65;
       const isLonValid = longitude >= -62.40 && longitude <= -62.10;
 
@@ -20,7 +19,7 @@ export const createOrder = async (req: Request, res: Response): Promise<void> =>
       }
     }
 
-    const newOrder = await Order.create({                    // Crea el pedido asegurando los campos correctos
+    const newOrder = await Order.create({
       clientName,
       clientPhone,
       address,
@@ -31,12 +30,12 @@ export const createOrder = async (req: Request, res: Response): Promise<void> =>
       longitude,
     });
 
-    res.status(201).json({                                     // Responde con código 201 (Creado) y el pedido
+    res.status(201).json({
       success: true,
       data: newOrder,
     });
   } catch (error: any) {
-    res.status(400).json({                                     // Atrapa errores de validación y responde 400
+    res.status(400).json({
       success: false,
       message: 'Error al crear el pedido',
       error: error.message,
@@ -44,14 +43,13 @@ export const createOrder = async (req: Request, res: Response): Promise<void> =>
   }
 };
 
-// Obtiene la lista de todos los pedidos registrados
 export const listOrders = async (_req: Request, res: Response): Promise<void> => {
   try {
-    const orders = await Order.findAll({ order: [['createdAt', 'DESC']] }); // Busca todos ordenados del más nuevo al más viejo
+    const orders = await Order.findAll({ order: [['createdAt', 'DESC']] });
     res.json({
       success: true,
       count: orders.length,
-      data: orders,                                                          // Devuelve la lista y la cantidad total
+      data: orders,
     });
   } catch (error: any) {
     res.status(500).json({
@@ -62,18 +60,22 @@ export const listOrders = async (_req: Request, res: Response): Promise<void> =>
   }
 };
 
-// Busca un pedido específico por su ID
 export const getOrderById = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { id } = req.params;                                               // Extrae el ID de la URL
-    const order = await Order.findByPk(id);                                  // Busca el pedido en la base de datos
-
-    if (!order) {
-      res.status(404).json({ success: false, message: 'Pedido no encontrado' }); // Si no existe, devuelve 404
+    const id = req.params.id;
+    if (typeof id !== 'string') {
+      res.status(400).json({ success: false, message: 'Identificador de pedido inválido.' });
       return;
     }
 
-    res.json({ success: true, data: order });                                // Devuelve el pedido encontrado
+    const order = await Order.findByPk(id);
+
+    if (!order) {
+      res.status(404).json({ success: false, message: 'Pedido no encontrado' });
+      return;
+    }
+
+    res.json({ success: true, data: order });
   } catch (error: any) {
     res.status(500).json({ success: false, message: 'Error al buscar el pedido', error: error.message });
   }

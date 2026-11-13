@@ -149,19 +149,15 @@ El repositorio implementa una estrategia de ramas estructurada para asegurar la 
 
 ## Estrategia de Despliegue (Producción)
 
+La aplicación tiene frontend, API y base de datos PostgreSQL como servicios separados. Para desplegarla en Render:
 
+1. Crear una base PostgreSQL y un servicio Web para el backend con directorio raíz `backend`, comando de instalación `npm install` y comando de inicio `npm start`.
+2. Configurar en el backend `NODE_ENV=production`, `DATABASE_URL` con la URL interna de PostgreSQL, `ADMIN_PASS`, `JWT_SECRET` y `FRONTEND_URL` con el origen público exacto del frontend. Generar un secreto JWT aleatorio de al menos 32 bytes. No usar la clave demo con datos reales.
+3. Crear el frontend como sitio estático con directorio raíz `frontend`, comando de build `npm install && npm run build` y directorio de publicación `dist`.
+4. Configurar `VITE_API_URL` en el frontend con la URL pública del backend más `/api`, por ejemplo `https://tu-api.onrender.com/api`. Esta URL es pública; no poner contraseñas ni secretos en variables `VITE_*`.
+5. Cada vez que cambie una variable `VITE_*`, volver a generar el build del frontend.
 
-Para llevar el proyecto a entorno productivo y disponibilizarlo online, la infraestructura se divide en servicios desacoplados en la nube:
-
-- Frontend: Desplegado en plataformas SPA como Vercel o Netlify, conectado de forma continua al repositorio de GitHub.
-
-- Backend: Alojado en servicios de infraestructura cloud como Render o Railway para exponer la API REST.
-
-- Base de Datos: Base de datos relacional PostgreSQL gestionada en la nube mediante proveedores como Supabase o instancias dedicadas de los mismos servicios de hosting.
-
-
-
----
+Render debe desplegar desde `main`. Integrar primero los cambios desde `dev` a `main` mediante un Pull Request. Antes de publicar, comprobar que el backend tenga sus variables configuradas y que la base de demo no contenga datos reales.
 
 
 
@@ -179,13 +175,13 @@ Para llevar el proyecto a entorno productivo y disponibilizarlo online, la infra
 
 
 
-2. Configurar las credenciales del Backend:
+2. Configurar las variables del backend:
 
    cd backend
 
    npm install
 
-   Copiar `.env.example` como `.env`, configurar `ADMIN_PASS` con una clave propia y `JWT_SECRET` con al menos 32 bytes aleatorios. Por ejemplo, generar el secreto con `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`. Elegí una contraseña larga y única para proteger datos personales. No subir `.env` a Git.
+   Copiar `.env.example` como `.env`, completar `ADMIN_PASS` y `JWT_SECRET` y configurar `DATABASE_URL` o las variables `DB_*`. Generar el secreto con `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`. No subir `.env` a Git.
 
 3. Iniciar el Backend:
 
@@ -199,6 +195,8 @@ Para llevar el proyecto a entorno productivo y disponibilizarlo online, la infra
    cd ../frontend
 
    npm install
+
+   Copiar `.env.example` como `.env`. El valor predeterminado apunta al backend local.
 
    npm run dev
 
