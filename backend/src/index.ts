@@ -1,11 +1,14 @@
 import express from 'express';
 import cors from 'cors';
 import sequelize from './database';
+import addressRoutes from './routes/address.routes';
 import orderRoutes from './routes/order.routes';
 
 const app = express();
 const port = process.env.PORT || 3000;
 const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+
+app.set('trust proxy', 1);
 
 if (process.env.NODE_ENV === 'production' && !process.env.FRONTEND_URL) {
   throw new Error('FRONTEND_URL debe configurarse en producción.');
@@ -15,6 +18,7 @@ app.use(cors({
   origin: frontendUrl,
 }));
 app.use(express.json());
+app.use('/api/addresses', addressRoutes);
 app.use('/api/orders', orderRoutes);
 
 const startServer = async () => {

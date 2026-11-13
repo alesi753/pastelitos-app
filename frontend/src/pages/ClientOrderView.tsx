@@ -1,5 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import api from '../services/api';
+import AddressAutocomplete, { type AddressLocation } from '../components/AddressAutocomplete';
+import LocationPicker from '../components/LocationPicker';
 import { formatName } from '../utils/formatName';
 import './ClientOrderView.css';
 
@@ -14,6 +16,8 @@ export default function ClientOrderView() {
   const [clientName, setClientName] = useState('');
   const [clientPhone, setClientPhone] = useState('');
   const [address, setAddress] = useState('');
+  const [addressLocation, setAddressLocation] = useState<AddressLocation | null>(null);
+  const [showLocationPicker, setShowLocationPicker] = useState(false);
   const [quantityMembrillo, setQuantityMembrillo] = useState(0);
   const [quantityBatata, setQuantityBatata] = useState(0);
   const [deliveryDate, setDeliveryDate] = useState(getToday);
@@ -26,8 +30,8 @@ export default function ClientOrderView() {
     event.preventDefault();
     setErrorMessage('');
 
-    if (address.trim().length < 3) {
-      setErrorMessage('Poné una dirección correcta.');
+    if (!addressLocation) {
+      setErrorMessage('Elegí una dirección de las sugerencias para confirmar su ubicación.');
       return;
     }
 
@@ -43,6 +47,7 @@ export default function ClientOrderView() {
         clientName: formattedName,
         clientPhone,
         address: address.trim(),
+        ...addressLocation,
         quantityMembrillo,
         quantityBatata,
         deliveryDate,
@@ -61,6 +66,8 @@ export default function ClientOrderView() {
     setClientName('');
     setClientPhone('');
     setAddress('');
+    setAddressLocation(null);
+    setShowLocationPicker(false);
     setQuantityMembrillo(0);
     setQuantityBatata(0);
     setDeliveryDate(getToday());
@@ -135,14 +142,36 @@ export default function ClientOrderView() {
 
             <div className="client-field">
               <label htmlFor="delivery-address">Dirección de entrega</label>
-              <input
+              <AddressAutocomplete
                 id="delivery-address"
-                autoComplete="street-address"
-                placeholder="Calle y número"
-                maxLength={200}
                 value={address}
-                onChange={(event) => setAddress(event.target.value)}
+                onChange={setAddress}
+                onSelect={(location) => {
+                  setAddressLocation(location);
+                  setShowLocationPicker(false);
+                }}
               />
+              <small className="client-field-hint">
+                Elegí una sugerencia y revisá el pin; podés corregirlo tocando el mapa. Direcciones por{' '}
+                <a href="https://www.geoapify.com/" target="_blank" rel="noreferrer">Geoapify</a>.
+              </small>
+              {addressLocation && (
+                <>
+                  <button
+                    type="button"
+                    className="client-submit-button"
+                    style={{ marginTop: '10px' }}
+                    onClick={() => setShowLocationPicker((shown) => !shown)}
+                  >
+                    {showLocationPicker ? 'Ocultar mapa' : 'Revisar o corregir ubicación'}
+                  </button>
+                  {showLocationPicker && (
+                    <div style={{ marginTop: '10px' }}>
+                      <LocationPicker location={addressLocation} onChange={setAddressLocation} />
+                    </div>
+                  )}
+                </>
+              )}
             </div>
 
             <fieldset className="client-flavors">

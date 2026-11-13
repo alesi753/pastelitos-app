@@ -1,0 +1,51 @@
+.address-autocomplete {
+  position: relative;
+}
+
+.address-suggestions {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 4px);
+  right: 0;
+  left: 0;
+  max-height: 240px;
+  margin: 0;
+  padding: 4px;
+  overflow: auto;
+  border: 1px solid #d8cabc;
+  border-radius: 8px;
+  background: #fffdf9;
+  box-shadow: 0 8px 24px rgba(62, 43, 29, 0.18);
+  list-style: none;
+}
+
+.address-suggestions button {
+  width: 100%;
+  padding: 9px 10px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: #38291f;
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.address-suggestions button:hover,
+.address-suggestions button:focus-visible {
+  outline: none;
+  background: #f1e7db;
+}
+
+.address-suggestions-status,
+.address-suggestions-error {
+  display: block;
+  padding: 9px 10px;
+  color: #77685c;
+  font-size: 12px;
+}
+
+.address-suggestions-error {
+  color: #943d31;
+}

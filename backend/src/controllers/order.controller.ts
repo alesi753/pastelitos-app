@@ -5,20 +5,6 @@ export const createOrder = async (req: Request, res: Response): Promise<void> =>
   try {
     const { clientName, clientPhone, address, deliveryDate, quantityMembrillo, quantityBatata, latitude, longitude } = req.body;
 
-    if (latitude !== null && latitude !== undefined && longitude !== null && longitude !== undefined) {
-      // Estos rangos aproximan el área urbana donde se realizan las entregas.
-      const isLatValid = latitude >= -38.85 && latitude <= -38.65;
-      const isLonValid = longitude >= -62.40 && longitude <= -62.10;
-
-      if (!isLatValid || !isLonValid) {
-        res.status(400).json({
-          success: false,
-          message: 'La ubicación está fuera de Bahía Blanca. Solo realizamos entregas en la ciudad.',
-        });
-        return;
-      }
-    }
-
     const newOrder = await Order.create({
       clientName,
       clientPhone,
