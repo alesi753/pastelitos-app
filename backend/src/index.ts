@@ -5,17 +5,14 @@ import orderRoutes from './routes/order.routes';
 
 const app = express();
 const port = process.env.PORT || 3000;
-const allowedOrigins = process.env.FRONTEND_URL
-  ?.split(',')
-  .map((origin) => origin.trim())
-  .filter(Boolean);
+const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
 
-if (process.env.NODE_ENV === 'production' && !allowedOrigins?.length) {
+if (process.env.NODE_ENV === 'production' && !process.env.FRONTEND_URL) {
   throw new Error('FRONTEND_URL debe configurarse en producción.');
 }
 
 app.use(cors({
-  origin: allowedOrigins?.length ? allowedOrigins : 'http://localhost:5173',
+  origin: frontendUrl,
 }));
 app.use(express.json());
 app.use('/api/orders', orderRoutes);
